@@ -1,0 +1,74 @@
+#include <stdio.h>
+#include <ctype.h>
+#include <string.h>
+
+int count, n = 0;
+char production[10][10];
+char first[10];
+
+void findfirst(char, int, int);
+
+int main()
+{
+    int i;
+    char c;
+
+    printf("Enter number of productions: ");
+    scanf("%d", &count);
+
+    printf("Enter productions (Example: E=TR):\n");
+    for(i = 0; i < count; i++)
+        scanf("%s", production[i]);
+
+    do
+    {
+        n = 0;
+
+        printf("\nEnter non-terminal to find FIRST: ");
+        scanf(" %c", &c);
+
+        findfirst(c, 0, 0);
+
+        printf("FIRST(%c) = { ", c);
+        for(i = 0; i < n; i++)
+            printf("%c ", first[i]);
+        printf("}\n");
+
+    } while(0);
+
+    return 0;
+}
+
+void findfirst(char c, int q1, int q2)
+{
+    int j;
+
+    if(!(isupper(c)))
+    {
+        first[n++] = c;
+    }
+
+    for(j = 0; j < count; j++)
+    {
+        if(production[j][0] == c)
+        {
+            if(production[j][2] == '#')
+            {
+                if(production[q1][q2] == '\0')
+                    first[n++] = '#';
+                else if(production[q1][q2] != '\0' && (q1 != 0 || q2 != 0))
+                    findfirst(production[q1][q2], q1, q2 + 1);
+                else
+                    first[n++] = '#';
+            }
+            else if(!isupper(production[j][2]))
+            {
+                first[n++] = production[j][2];
+            }
+            else
+            {
+                findfirst(production[j][2], j, 3);
+            }
+        }
+    }
+}
