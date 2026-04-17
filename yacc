@@ -45,3 +45,10 @@ int main()
     printf("Valid Expression\n");
     return 0;
 }
+
+
+run
+yacc -d exp8.y
+lex exp8.l
+gcc lex.yy.c y.tab.c -ll
+./a.out
