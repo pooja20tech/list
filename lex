@@ -40,3 +40,9 @@ int main()
 
     return 0;
 }
+
+
+
+run   lex spcc07.l
+gcc lex.yy.c -o spcc07 -ll
+./spcc07
