@@ -1,0 +1,79 @@
+MOT = {
+    "STOP": (0, 1),
+    "ADD": (1, 1),
+    "SUB": (2, 1),
+    "MULT": (3, 1),
+    "MOVER": (4, 1),
+    "MOVEM": (5, 1)
+}
+
+POT = ["START", "END", "DS", "DC"]
+
+symbol_table = {}
+intermediate_code = []
+
+LC = 0
+
+program = [
+    "START 100",
+    "A DS 1",
+    "MOVER AREG A",
+    "ADD AREG B",
+    "B DC 5",
+    "STOP",
+    "END"
+]
+
+print("----- PASS 1 ASSEMBLER -----\n")
+
+for line in program:
+    parts = line.split()
+
+    if parts[0] == "START":
+        LC = int(parts[1])
+        intermediate_code.append(f"(AD,01) (C,{LC})")
+        continue
+
+    if parts[0] == "END":
+        intermediate_code.append("(AD,02)")
+        break
+
+    # Label present
+    if len(parts) == 3:
+        label, opcode, operand = parts
+        symbol_table[label] = LC
+    else:
+        opcode = parts[0]
+        operand = parts[1] if len(parts) > 1 else None
+
+    if opcode in MOT:
+        op_code, length = MOT[opcode]
+        intermediate_code.append(f"({LC}) (IS,{op_code:02d}) {operand}")
+        LC += length
+
+    elif opcode == "DS":
+        intermediate_code.append(f"({LC}) (DL,02) (C,{operand})")
+        LC += int(operand)
+
+    elif opcode == "DC":
+        intermediate_code.append(f"({LC}) (DL,01) (C,{operand})")
+        LC += 1
+
+
+print("Machine Opcode Table (MOT)")
+print("Mnemonic\tOpcode\tLength")
+for k, v in MOT.items():
+    print(f"{k}\t\t{v[0]:02d}\t{v[1]}")
+
+print("\nPseudo Opcode Table (POT)")
+for p in POT:
+    print(p)
+
+print("\nSymbol Table")
+print("Symbol\tAddress")
+for s, a in symbol_table.items():
+    print(f"{s}\t{a}")
+
+print("\nIntermediate Code")
+for ic in intermediate_code:
+    print(ic)
