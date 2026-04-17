@@ -1,0 +1,51 @@
+#include <stdio.h>
+#include <string.h>
+
+int main() {
+    FILE *fp;
+    char label[10], opcode[10], operand[10];
+    char macroname[10];
+    int mdtc = 1, mntc = 1;
+
+    fp = fopen("input.txt", "r");
+
+    if (fp == NULL) {
+        printf("Error: input.txt not found\n");
+        return 1;
+    }
+
+    printf("MACRO NAME TABLE (MNT)\n");
+    printf("Index\tMacroName\tMDT Index\n");
+
+    int mnt_index = 1;
+    char mnt_name[10];
+    int mnt_mdt_index = 0;
+
+    while (fscanf(fp, "%s %s %s", label, opcode, operand) != EOF) {
+
+        if (strcmp(opcode, "MACRO") == 0) {
+            // Next line contains macro name and operand
+            fscanf(fp, "%s %s %s", label, opcode, operand);
+
+            strcpy(macroname, opcode);
+
+            printf("%d\t%s\t\t%d\n", mntc, macroname, mdtc);
+
+            printf("\nMACRO DEFINITION TABLE (MDT)\n");
+
+            while (1) {
+                printf("%d\t%s %s %s\n", mdtc, label, opcode, operand);
+
+                if (strcmp(opcode, "MEND") == 0)
+                    break;
+
+                fscanf(fp, "%s %s %s", label, opcode, operand);
+                mdtc++;
+            }
+            break;
+        }
+    }
+
+    fclose(fp);
+    return 0;
+}
